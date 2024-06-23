@@ -1,4 +1,6 @@
 import express from "express";
+import { blueLog } from "./utils/colorLogs";
+
 const app = express();
 
 app.get("/", function (req, res) {
@@ -8,5 +10,5 @@ app.get("/", function (req, res) {
 });
 
 app.listen(3331, () => {
-  console.log(`[::] Server is running at http://localhost:3331`);
+  blueLog(`[::] Server is running at http://localhost:3331`);
 });
