@@ -2,6 +2,7 @@ import express from "express";
 import { blueLog } from "./utils/colorLogs";
 
 const app = express();
+const port = 3001;
 
 app.get("/", function (req, res) {
   res
