@@ -11,7 +11,6 @@ export default [
   {
     ignores: ["node_modules", "dist", "package-lock.json"]
   },
-
   {
     rules: {
       "no-unused-vars": ["error"]
