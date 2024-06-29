@@ -1,6 +1,7 @@
 import globals from "globals";
 import pluginJs from "@eslint/js";
 import tseslint from "typescript-eslint";
+import eslintConfigPrettier from 'eslint-config-prettier'
 
 export default [
   { files: ["**/*.{js,mjs,cjs,ts}"] },
@@ -8,21 +9,12 @@ export default [
   pluginJs.configs.recommended,
   ...tseslint.configs.recommended,
   {
-    ignores: ["node_modules", "dist"]
+    ignores: ["node_modules", "dist", "package-lock.json"]
   },
   eslintConfigPrettier,
   {
     rules: {
-      "no-unused-vars": [
-        "error",
-        {
-          vars: "all",
-          args: "after-used",
-          caughtErrors: "all",
-          ignoreRestSiblings: false,
-          reportUsedIgnorePattern: false
-        }
-      ]
+      "no-unused-vars": ["error"]
     }
   }
 ];

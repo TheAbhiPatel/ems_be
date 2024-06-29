@@ -14,17 +14,20 @@
   "license": "ISC",
   "description": "",
   "lint-staged": {
-    "*.{js,json,ts}": "prettier --write"
+    "*.{js,json,ts}": "eslint --fix"
+  },
+  "overrides": {
+    "eslint": "^9.6.0"
   },
   "dependencies": {
     "express": "^4.19.2"
   },
   "devDependencies": {
-    "@eslint/js": "^9.5.0",
+    "@eslint/js": "^9.6.0",
     "@types/colors": "^1.2.1",
     "@types/express": "^4.17.21",
     "colors": "^1.4.0",
-    "eslint": "^9.5.0",
+    "eslint": "^9.6.0",
     "eslint-config-prettier": "^9.1.0",
     "globals": "^15.6.0",
     "husky": "^9.0.11",
