@@ -1,6 +1,7 @@
 import express from "express";
 import { blueLog } from "./utils/colorLogs";
 import router from "./routes";
+import { errorHandler } from "./middlewares/errorHandler";
 
 const app = express();
 
@@ -21,6 +22,9 @@ app.use("/api/v1", router);
 app.use("*", (req, res) => {
   res.status(404).json({ success: false, message: "Route not found." });
 });
+
+/** ---> Handling global errors */
+app.use(errorHandler);
 
 app.listen(3331, () => {
   blueLog(`[::] Server is running at http://localhost:3331`);
