@@ -4,12 +4,14 @@ import router from "./routes";
 import { errorHandler } from "./middlewares/errorHandler";
 import { HOST_NAME, MONGO_DB_URL, PORT } from "./config";
 import { connectDb } from "./utils/connectDb";
+import cors from "cors";
 
 const app = express();
 
 /** ---> Registering middlewares */
 app.use(express.json({ limit: "10kb" }));
 app.use(express.urlencoded({ extended: true }));
+app.use(cors());
 
 app.get("/", function (req, res) {
   res
