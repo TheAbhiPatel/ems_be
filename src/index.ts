@@ -2,7 +2,8 @@ import express from "express";
 import { blueLog } from "./utils/colorLogs";
 import router from "./routes";
 import { errorHandler } from "./middlewares/errorHandler";
-import { HOST_NAME, PORT } from "./config";
+import { HOST_NAME, MONGO_DB_URL, PORT } from "./config";
+import { connectDb } from "./utils/connectDb";
 
 const app = express();
 
@@ -29,4 +30,5 @@ app.use(errorHandler);
 
 app.listen(Number(PORT), HOST_NAME, () => {
   blueLog(`[::] Server is running at http://${HOST_NAME}:${PORT}`);
+  connectDb(MONGO_DB_URL);
 });
