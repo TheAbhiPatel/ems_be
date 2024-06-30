@@ -5,6 +5,7 @@ import { errorHandler } from "./middlewares/errorHandler";
 import { HOST_NAME, MONGO_DB_URL, PORT } from "./config";
 import { connectDb } from "./utils/connectDb";
 import cors from "cors";
+import helmet from "helmet";
 
 const app = express();
 
@@ -12,6 +13,7 @@ const app = express();
 app.use(express.json({ limit: "10kb" }));
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
+app.use(helmet());
 
 app.get("/", function (req, res) {
   res
