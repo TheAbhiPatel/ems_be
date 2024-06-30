@@ -2,6 +2,7 @@ import express from "express";
 import { blueLog } from "./utils/colorLogs";
 import router from "./routes";
 import { errorHandler } from "./middlewares/errorHandler";
+import { HOST_NAME, PORT } from "./config";
 
 const app = express();
 
@@ -26,6 +27,6 @@ app.use("*", (req, res) => {
 /** ---> Handling global errors */
 app.use(errorHandler);
 
-app.listen(3331, () => {
-  blueLog(`[::] Server is running at http://localhost:3331`);
+app.listen(Number(PORT), HOST_NAME, () => {
+  blueLog(`[::] Server is running at http://${HOST_NAME}:${PORT}`);
 });
