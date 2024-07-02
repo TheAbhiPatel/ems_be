@@ -36,6 +36,7 @@ export const registerHandler: RequestHandler = async (req, res, next) => {
 export const loginHandler: RequestHandler = async (req, res, next) => {
   try {
     const { email, password } = req.body;
+
     const user = await userModel.findOne({ email });
     if (!user)
       return res
@@ -51,11 +52,11 @@ export const loginHandler: RequestHandler = async (req, res, next) => {
         .json({ success: false, message: "User is blocked." });
     if (user.isDeleted)
       return res
-        .status(401)
+        .status(403)
         .json({ success: false, message: "This account is deleted." });
 
     const isPasswordMatched = await bcrypt.compare(password, user.password);
-    if (isPasswordMatched)
+    if (!isPasswordMatched)
       return res
         .status(401)
         .json({ success: false, message: "Wrong credantials." });
