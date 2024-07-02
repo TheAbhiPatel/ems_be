@@ -32,3 +32,38 @@ export const registerHandler: RequestHandler = async (req, res, next) => {
     next(error);
   }
 };
+
+export const loginHandler: RequestHandler = async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+    const user = await userModel.findOne({ email });
+    if (!user)
+      return res
+        .status(401)
+        .json({ success: false, message: "Wrong credantials." });
+    if (!user.isVerified)
+      return res
+        .status(401)
+        .json({ success: false, message: "Email not verified." });
+    if (user.isBlocked)
+      return res
+        .status(401)
+        .json({ success: false, message: "User is blocked." });
+    if (user.isDeleted)
+      return res
+        .status(401)
+        .json({ success: false, message: "This account is deleted." });
+
+    const isPasswordMatched = await bcrypt.compare(password, user.password);
+    if (isPasswordMatched)
+      return res
+        .status(401)
+        .json({ success: false, message: "Wrong credantials." });
+
+    res
+      .status(200)
+      .json({ success: true, message: "User logged in successfully." });
+  } catch (error) {
+    next(error);
+  }
+};
