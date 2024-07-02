@@ -2,6 +2,8 @@ import { RequestHandler } from "express";
 import userModel from "src/models/user.model";
 import bcrypt from "bcryptjs";
 import userProfileModel from "src/models/userProfile.model";
+import jwt from "jsonwebtoken";
+import { JWT_SECRET } from "@config/index";
 
 export const registerHandler: RequestHandler = async (req, res, next) => {
   try {
@@ -61,9 +63,11 @@ export const loginHandler: RequestHandler = async (req, res, next) => {
         .status(401)
         .json({ success: false, message: "Wrong credantials." });
 
+    const token = jwt.sign({ userId: user._id, role: user.role }, JWT_SECRET);
+
     res
       .status(200)
-      .json({ success: true, message: "User logged in successfully." });
+      .json({ success: true, message: "User logged in successfully.", token });
   } catch (error) {
     next(error);
   }
