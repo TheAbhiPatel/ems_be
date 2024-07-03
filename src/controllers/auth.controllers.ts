@@ -4,6 +4,7 @@ import bcrypt from "bcryptjs";
 import userProfileModel from "src/models/userProfile.model";
 import jwt from "jsonwebtoken";
 import { JWT_SECRET } from "@config/index";
+import { sendEMail } from "src/utils/sendEMail";
 
 export const registerHandler: RequestHandler = async (req, res, next) => {
   try {
@@ -27,9 +28,19 @@ export const registerHandler: RequestHandler = async (req, res, next) => {
       lastName
     });
 
-    res
-      .status(201)
-      .json({ success: true, message: "User registered successfully." });
+    const token = jwt.sign({ userId: newUser._id }, JWT_SECRET);
+
+    const testMessageUrl = await sendEMail({
+      mailTo: email,
+      subject: "Email for verification",
+      html: `<h1>Hello ${firstName}, </h1> <p> please verify your email. <br/> this is verification token : ${token} </p>`
+    });
+
+    res.status(201).json({
+      success: true,
+      message: "User registered successfully, Please verify your email.",
+      testMessageUrl
+    });
   } catch (error) {
     next(error);
   }
