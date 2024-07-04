@@ -2,7 +2,7 @@ import { RequestHandler } from "express";
 import userModel from "src/models/user.model";
 import bcrypt from "bcryptjs";
 import userProfileModel from "src/models/userProfile.model";
-import jwt from "jsonwebtoken";
+import jwt, { JsonWebTokenError } from "jsonwebtoken";
 import { JWT_SECRET } from "@config/index";
 import { sendEMail } from "src/utils/sendEMail";
 
@@ -28,7 +28,9 @@ export const registerHandler: RequestHandler = async (req, res, next) => {
       lastName
     });
 
-    const token = jwt.sign({ userId: newUser._id }, JWT_SECRET);
+    const token = jwt.sign({ userId: newUser._id }, JWT_SECRET, {
+      expiresIn: "2m"
+    });
 
     const testMessageUrl = await sendEMail({
       mailTo: email,
@@ -80,6 +82,39 @@ export const loginHandler: RequestHandler = async (req, res, next) => {
       .status(200)
       .json({ success: true, message: "User logged in successfully.", token });
   } catch (error) {
+    next(error);
+  }
+};
+
+export const verifyEmailHandler: RequestHandler = async (req, res, next) => {
+  try {
+    const { token } = req.body;
+    const userInfo = jwt.verify(token, JWT_SECRET) as { userId: string };
+    if (!userInfo)
+      return res.status(403).json({
+        success: false,
+        message: "Token is invalid or expired."
+      });
+    const user = await userModel.findById(userInfo.userId);
+    if (!user)
+      return res.status(404).json({
+        success: false,
+        message: "User not found."
+      });
+    user.isVerified = true;
+    user.save();
+
+    res.status(200).json({
+      success: true,
+      message: "User verified successfully."
+    });
+  } catch (error) {
+    if (error instanceof JsonWebTokenError) {
+      return res.status(403).json({
+        success: false,
+        message: "Token is invalid or expired."
+      });
+    }
     next(error);
   }
 };
