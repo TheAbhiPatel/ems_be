@@ -107,7 +107,7 @@ export const verifyEmailHandler: RequestHandler = async (req, res, next) => {
         message: "User already verified."
       });
     user.isVerified = true;
-    user.save();
+    await user.save();
 
     res.status(200).json({
       success: true,
@@ -202,6 +202,42 @@ export const sendForgetPasswordEmailHandler: RequestHandler = async (
       testMessageUrl
     });
   } catch (error) {
+    next(error);
+  }
+};
+
+export const forgetPasswordHandler: RequestHandler = async (req, res, next) => {
+  try {
+    const { token, password } = req.body;
+    const userInfo = jwt.verify(token, JWT_SECRET) as { userId: string };
+    if (!userInfo)
+      return res.status(403).json({
+        success: false,
+        message: "Token is invalid or expired."
+      });
+    const user = await userModel.findById(userInfo.userId);
+    if (!user)
+      return res.status(404).json({
+        success: false,
+        message: "User not found."
+      });
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+    user.password = hashedPassword;
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Password forgetted successfully."
+    });
+  } catch (error) {
+    if (error instanceof JsonWebTokenError) {
+      return res.status(403).json({
+        success: false,
+        message: "Token is invalid or expired."
+      });
+    }
     next(error);
   }
 };
