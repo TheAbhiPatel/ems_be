@@ -164,3 +164,44 @@ export const sendVerificationEmailHandler: RequestHandler = async (
     next(error);
   }
 };
+
+export const sendForgetPasswordEmailHandler: RequestHandler = async (
+  req,
+  res,
+  next
+) => {
+  const { email } = req.body;
+
+  try {
+    const user = await userModel.findOne({ email });
+    if (!user)
+      return res.status(404).json({
+        success: false,
+        message: "User not found."
+      });
+    if (!user.isVerified)
+      return res.status(403).json({
+        success: false,
+        message: "User is not verified, please verify your email first."
+      });
+
+    const userProfile = await userProfileModel.findOne({ user: user._id });
+    const token = jwt.sign({ userId: user._id }, JWT_SECRET, {
+      expiresIn: "2m"
+    });
+
+    const testMessageUrl = await sendEMail({
+      mailTo: email,
+      subject: "Email for Forget password",
+      html: `<h1>Hello ${userProfile?.firstName}, </h1> <p> please click on the link below and forget your password. <br/> this is forget password token : ${token} </p>`
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Foget password email sent successfully.",
+      testMessageUrl
+    });
+  } catch (error) {
+    next(error);
+  }
+};

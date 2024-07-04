@@ -1,6 +1,7 @@
 import {
   loginHandler,
   registerHandler,
+  sendForgetPasswordEmailHandler,
   sendVerificationEmailHandler,
   verifyEmailHandler
 } from "@cont/auth.controllers";
@@ -12,5 +13,6 @@ authRouter.post("/register", registerHandler);
 authRouter.post("/login", loginHandler);
 authRouter.post("/verify-email", verifyEmailHandler);
 authRouter.post("/send-verification-email", sendVerificationEmailHandler);
+authRouter.post("/send-forget-password-email", sendForgetPasswordEmailHandler);
 
 export default authRouter;
