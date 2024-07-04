@@ -101,6 +101,11 @@ export const verifyEmailHandler: RequestHandler = async (req, res, next) => {
         success: false,
         message: "User not found."
       });
+    if (user.isVerified)
+      return res.status(403).json({
+        success: false,
+        message: "User already verified."
+      });
     user.isVerified = true;
     user.save();
 
