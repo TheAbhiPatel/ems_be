@@ -118,3 +118,44 @@ export const verifyEmailHandler: RequestHandler = async (req, res, next) => {
     next(error);
   }
 };
+
+export const sendVerificationEmailHandler: RequestHandler = async (
+  req,
+  res,
+  next
+) => {
+  const { email } = req.body;
+
+  try {
+    const user = await userModel.findOne({ email });
+    if (!user)
+      return res.status(404).json({
+        success: false,
+        message: "User not found."
+      });
+    if (user.isVerified)
+      return res.status(403).json({
+        success: false,
+        message: "User already verified."
+      });
+
+    const userProfile = await userProfileModel.findOne({ user: user._id });
+    const token = jwt.sign({ userId: user._id }, JWT_SECRET, {
+      expiresIn: "2m"
+    });
+
+    const testMessageUrl = await sendEMail({
+      mailTo: email,
+      subject: "Email for verification",
+      html: `<h1>Hello ${userProfile?.firstName}, </h1> <p> please verify your email. <br/> this is verification token : ${token} </p>`
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "Verification email sent successfully.",
+      testMessageUrl
+    });
+  } catch (error) {
+    next(error);
+  }
+};
