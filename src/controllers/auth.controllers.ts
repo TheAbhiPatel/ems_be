@@ -241,3 +241,33 @@ export const forgetPasswordHandler: RequestHandler = async (req, res, next) => {
     next(error);
   }
 };
+
+export const changePasswordHandler: RequestHandler = async (req, res, next) => {
+  try {
+    const userId = req.user.userId;
+    const { password, newPassword } = req.body;
+    const user = await userModel.findById(userId);
+    if (!user)
+      return res.status(404).json({
+        success: false,
+        message: "User not found."
+      });
+    const isPasswordMatched = await bcrypt.compare(password, user.password);
+    if (!isPasswordMatched)
+      return res.status(403).json({
+        success: false,
+        message: "Please provide correct previous password."
+      });
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+    user.password = hashedPassword;
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Password changed successfully."
+    });
+  } catch (error) {
+    next(error);
+  }
+};
