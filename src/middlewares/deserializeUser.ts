@@ -30,6 +30,9 @@ export const deserializeUser: RequestHandler = async (req, res, next) => {
         if (userInfo) {
           const user = await userModel.findById(userInfo.userId);
           if (user && !user.isBlocked) {
+            if (!req.user) {
+              req.user = { userId: "", role: ERoles.EMPLOYEE };
+            }
             req.user.userId = userInfo.userId;
             req.user.role = user.role;
           }
