@@ -4,12 +4,20 @@ import router from "./routes";
 import { errorHandler } from "./middlewares/errorHandler";
 import { HOST_NAME, MONGO_DB_URL, PORT } from "./config";
 import { connectDb } from "./utils/connectDb";
+import cors from "cors";
+import helmet from "helmet";
+import { deserializeUser } from "./middlewares/deserializeUser";
 
 const app = express();
 
 /** ---> Registering middlewares */
 app.use(express.json({ limit: "10kb" }));
 app.use(express.urlencoded({ extended: true }));
+app.use(cors());
+app.use(helmet());
+
+/** ---> Registering custom middlewares */
+app.use(deserializeUser);
 
 app.get("/", function (req, res) {
   res
