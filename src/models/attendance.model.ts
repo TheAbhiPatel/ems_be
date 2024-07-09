@@ -1,60 +1,34 @@
-// #####################################################
-// ******* Need to work on schema for attendance *******
-// #####################################################
 import { Document, Schema, model } from "mongoose";
 
-/* eslint-disable no-unused-vars */
-export enum ERoles {
-  SUPER_ADMIN = "SUPER_ADMIN",
-  ADMIN = "ADMIN",
-  MANAGER = "MANAGER",
-  EMPLOYEE = "EMPLOYEE"
-}
-/* eslint-enable no-unused-vars */
-
-interface IBaseUser {
-  email: string;
-  password: string;
-  role: ERoles;
-  isVerified: boolean;
-  isBlocked: boolean;
-  isDeleted: boolean;
+interface IBaseAttendance {
+  user: Schema.Types.ObjectId;
+  inTime: Date;
+  outTime: Date;
 }
 
-interface IUserSchema extends Document, IBaseUser {}
+interface IAttendanceSchema extends Document, IBaseAttendance {}
 
-const userSchema = new Schema<IUserSchema>(
+const attendanceSchema = new Schema<IAttendanceSchema>(
   {
-    email: {
-      type: String,
+    user: {
+      type: Schema.Types.ObjectId,
       required: true,
-      unique: true,
+      ref: "user",
       index: true
     },
-    password: {
-      type: String,
+    inTime: {
+      type: Date,
       required: true
     },
-    role: {
-      type: String,
-      enum: ERoles,
-      default: ERoles.EMPLOYEE
-    },
-    isVerified: {
-      type: Boolean,
-      default: false
-    },
-    isBlocked: {
-      type: Boolean,
-      default: false
-    },
-    isDeleted: {
-      type: Boolean,
-      default: false
+    outTime: {
+      type: Date
     }
   },
   { timestamps: true }
 );
 
-const userModel = model<IUserSchema>("user", userSchema);
-export default userModel;
+const attendanceModel = model<IAttendanceSchema>(
+  "attendance",
+  attendanceSchema
+);
+export default attendanceModel;
