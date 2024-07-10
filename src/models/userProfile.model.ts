@@ -8,7 +8,7 @@ export enum EGender {
 }
 /* eslint-enable no-unused-vars */
 
-interface IBaseAddress {
+export interface IBaseAddress {
   line1: string;
   line2: string;
   city: string;
@@ -30,7 +30,7 @@ interface IBaseUserProfile {
 interface IAddressSchema extends Document, IBaseAddress {}
 interface IUserProfileSchema extends Document, IBaseUserProfile {}
 
-const addressSchema = new Schema<IAddressSchema>({
+export const addressSchema = new Schema<IAddressSchema>({
   line1: {
     type: String
   },
