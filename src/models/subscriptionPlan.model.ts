@@ -1,6 +1,7 @@
 import { Document, Schema, model } from "mongoose";
 
 interface IBaseSubscriptionPlan {
+  createdBy: Schema.Types.ObjectId;
   name: string;
   description: string;
   monthlyPrice: number;
@@ -12,6 +13,10 @@ interface ISubscriptionPlanSchema extends Document, IBaseSubscriptionPlan {}
 
 const subscriptionPlanSchema = new Schema<ISubscriptionPlanSchema>(
   {
+    createdBy: {
+      type: Schema.Types.ObjectId,
+      required: true
+    },
     name: {
       type: String,
       required: true,
