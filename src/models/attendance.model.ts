@@ -2,6 +2,7 @@ import { Document, Schema, model } from "mongoose";
 
 interface IBaseAttendance {
   user: Schema.Types.ObjectId;
+  employeeId: Schema.Types.ObjectId;
   inTime: Date;
   outTime: Date;
 }
@@ -14,6 +15,12 @@ const attendanceSchema = new Schema<IAttendanceSchema>(
       type: Schema.Types.ObjectId,
       required: true,
       ref: "user",
+      index: true
+    },
+    employeeId: {
+      type: Schema.Types.ObjectId,
+      required: true,
+      ref: "employee",
       index: true
     },
     inTime: {
