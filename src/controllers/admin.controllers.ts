@@ -9,15 +9,8 @@ export const completeCompanyProfileHandler: RequestHandler = async (
   res,
   next
 ) => {
-  const {
-    companyName,
-    mobile,
-    address,
-    subscription,
-    subscriptionType,
-    subscriptionStartDate,
-    subscriptionEndDate
-  } = req.body;
+  const { companyName, mobile, address, subscription, subscriptionType } =
+    req.body;
 
   try {
     const userId = req.user.userId;
@@ -39,6 +32,15 @@ export const completeCompanyProfileHandler: RequestHandler = async (
         .status(403)
         .json({ success: false, message: "This account is deleted." });
 
+    const isCompanyProfileExists = await companyProfileModel.findOne({
+      admin: userId
+    });
+
+    if (isCompanyProfileExists)
+      return res
+        .status(403)
+        .json({ success: false, message: "Company profile already exists." });
+
     const profile = await userProfileModel.findOne({ user: userId });
     if (!profile)
       return res
@@ -48,15 +50,19 @@ export const completeCompanyProfileHandler: RequestHandler = async (
     profile.mobile = mobile;
     await profile.save();
 
+    const now = new Date();
+    const oneMonthFromNow = new Date(now).setMonth(now.getMonth() + 1);
+
     await companyProfileModel.create({
+      admin: userId,
       companyName,
       mobile,
       address,
       email: user.email,
       subscription,
       subscriptionType,
-      subscriptionStartDate,
-      subscriptionEndDate
+      subscriptionStartDate: now,
+      subscriptionEndDate: oneMonthFromNow
     });
 
     res.status(200).json({
