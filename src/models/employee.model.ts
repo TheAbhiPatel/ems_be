@@ -4,6 +4,7 @@ interface IBaseEmployee {
   user: Schema.Types.ObjectId;
   userProfile: Schema.Types.ObjectId;
   company: Schema.Types.ObjectId;
+  createdBy: Schema.Types.ObjectId;
   position: string;
   department: string;
   dateOfJoining: Date;
@@ -27,6 +28,10 @@ const employeeSchema = new Schema<IEmployeeSchema>(
       unique: true
     },
     company: {
+      type: Schema.Types.ObjectId,
+      required: true
+    },
+    createdBy: {
       type: Schema.Types.ObjectId,
       required: true
     },
