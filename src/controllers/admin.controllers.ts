@@ -1,8 +1,9 @@
 import { RequestHandler } from "express";
-import attendanceModel from "src/models/attendance.model";
 import companyProfileModel from "src/models/companyProfile.model";
+import employeeModel from "src/models/employee.model";
 import userModel from "src/models/user.model";
 import userProfileModel from "src/models/userProfile.model";
+import bcrypt from "bcryptjs";
 
 export const completeCompanyProfileHandler: RequestHandler = async (
   req,
@@ -76,18 +77,52 @@ export const completeCompanyProfileHandler: RequestHandler = async (
 
 export const addEmployeeHandler: RequestHandler = async (req, res, next) => {
   try {
-    const userId = req.user.userId;
+    const createdBy = req.user.userId;
 
-    // const attendance = await attendanceModel.findOne({ user: userId });
+    const createdByProfile = await userProfileModel.findOne({
+      user: createdBy
+    });
+    if (!createdByProfile)
+      return res
+        .status(404)
+        .json({ success: false, message: "Created by profile not found." });
 
-    await attendanceModel.create({
-      user: userId,
-      inTime: new Date()
+    const { firstName, lastName, email, password } = req.body;
+    const { position, department, dateOfJoining, salary } = req.body;
+
+    const user = await userModel.findOne({ email });
+    if (user)
+      return res
+        .status(403)
+        .json({ success: false, message: "User already registered." });
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    const newUser = await userModel.create({
+      email,
+      password: hashedPassword
+    });
+    const userProfile = await userProfileModel.create({
+      user: newUser._id,
+      firstName,
+      lastName
+    });
+
+    await employeeModel.create({
+      user: newUser._id,
+      userProfile: userProfile._id,
+      company: createdByProfile.company,
+      createdBy,
+      position,
+      department,
+      dateOfJoining,
+      salary
     });
 
     res.status(200).json({
       success: true,
-      message: "You are successfully punched in."
+      message: "Employee profile created successfully."
     });
   } catch (error) {
     next(error);
