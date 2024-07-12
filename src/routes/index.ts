@@ -14,7 +14,7 @@ router.use(
   authorize([ERoles.SUPER_ADMIN]),
   subscriptionRouter
 );
-router.use("/admin", adminRouter);
+router.use("/admin", authorize([ERoles.ADMIN]), adminRouter);
 router.use(
   "/attendance",
   authorize([ERoles.ADMIN, ERoles.MANAGER, ERoles.EMPLOYEE]),
