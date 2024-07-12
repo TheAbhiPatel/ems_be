@@ -19,6 +19,7 @@ export interface IBaseAddress {
 
 interface IBaseUserProfile {
   user: Schema.Types.ObjectId;
+  company: Schema.Types.ObjectId;
   firstName: string;
   lastName: string;
   gender: EGender;
@@ -58,6 +59,9 @@ const userProfileSchema = new Schema<IUserProfileSchema>(
       required: true,
       unique: true,
       index: true
+    },
+    company: {
+      type: Schema.Types.ObjectId
     },
     firstName: {
       type: String,
