@@ -9,7 +9,11 @@ import adminRouter from "./admin.routes";
 const router = Router();
 
 router.use("/auth", authRouter);
-router.use("/subscriptions", subscriptionRouter);
+router.use(
+  "/subscriptions",
+  authorize([ERoles.SUPER_ADMIN]),
+  subscriptionRouter
+);
 router.use("/admin", adminRouter);
 router.use(
   "/attendance",
