@@ -34,3 +34,21 @@ export const createSubscriptionPlanHandler: RequestHandler = async (
     next(error);
   }
 };
+
+export const getAllSubscriptionPlanHandler: RequestHandler = async (
+  req,
+  res,
+  next
+) => {
+  try {
+    const subsPlans = await subscriptionPlanModel.find();
+
+    res.status(200).json({
+      success: true,
+      message: "Subscription plan successfully fetched.",
+      subsPlans
+    });
+  } catch (error) {
+    next(error);
+  }
+};
