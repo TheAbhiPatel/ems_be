@@ -4,6 +4,7 @@ import employeeModel from "src/models/employee.model";
 import userModel from "src/models/user.model";
 import userProfileModel from "src/models/userProfile.model";
 import bcrypt from "bcryptjs";
+import { ObjectId } from "mongoose";
 
 export const completeCompanyProfileHandler: RequestHandler = async (
   req,
@@ -42,19 +43,10 @@ export const completeCompanyProfileHandler: RequestHandler = async (
         .status(403)
         .json({ success: false, message: "Company profile already exists." });
 
-    const profile = await userProfileModel.findOne({ user: userId });
-    if (!profile)
-      return res
-        .status(404)
-        .json({ success: false, message: "Profile not found." });
-    profile.address = address;
-    profile.mobile = mobile;
-    await profile.save();
-
     const now = new Date();
     const oneMonthFromNow = new Date(now).setMonth(now.getMonth() + 1);
 
-    await companyProfileModel.create({
+    const company = await companyProfileModel.create({
       admin: userId,
       companyName,
       mobile,
@@ -65,6 +57,17 @@ export const completeCompanyProfileHandler: RequestHandler = async (
       subscriptionStartDate: now,
       subscriptionEndDate: oneMonthFromNow
     });
+
+    const profile = await userProfileModel.findOne({ user: userId });
+    if (!profile)
+      return res
+        .status(404)
+        .json({ success: false, message: "Profile not found." });
+
+    profile.company = company._id as ObjectId;
+    profile.mobile = mobile;
+    profile.address = address;
+    await profile.save();
 
     res.status(200).json({
       success: true,
@@ -87,8 +90,8 @@ export const addEmployeeHandler: RequestHandler = async (req, res, next) => {
         .status(404)
         .json({ success: false, message: "Created by profile not found." });
 
-    const { firstName, lastName, email, password } = req.body;
-    const { position, department, dateOfJoining, salary } = req.body;
+    const { firstName, lastName, email, password, mobile } = req.body;
+    const { position, department, dateOfJoining, salary, address } = req.body;
 
     const user = await userModel.findOne({ email });
     if (user)
@@ -106,7 +109,9 @@ export const addEmployeeHandler: RequestHandler = async (req, res, next) => {
     const userProfile = await userProfileModel.create({
       user: newUser._id,
       firstName,
-      lastName
+      lastName,
+      mobile,
+      address
     });
 
     await employeeModel.create({
